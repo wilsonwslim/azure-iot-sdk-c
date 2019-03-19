@@ -1,40 +1,36 @@
 #!/bin/bash
-#
-# Copyright © 2018 Moxa Inc. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
+# Copyright (C) 2019 Moxa Inc. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
 
 DIR_WRK=$(dirname $(readlink -e $0))
 SCRIPT=$(basename $0)
 
 GIT_SDK=https://github.com/Azure/azure-iot-sdk-c.git
 VER_SDK=2018-10-03
-SRC_TOOLCHAIN=/usr/local/bin/gcc-linaro-5.1-2015.08-x86_64_arm-linux-gnueabihf
+SRC_TOOLCHAIN=/usr/local/arm-linux-gnueabihf
 
 SRC_ROOTFS=$DIR_WRK/rootfs
 DST_SDK=$DIR_WRK/output/sdk_azure
 DST_TOOLCHAIN=$DIR_WRK/output/env_azure
 DST_ROOTFS=$DST_TOOLCHAIN/arm-linux-gnueabihf
 
+CMAKE_SAMPLE=$DST_SDK/serializer/samples/CMakeLists.txt
+SRC_SAMPLE=$DIR_WRK/sample/source
+BIN_SAMPLE=$DIR_WRK/sample/binary
+
 function sdk_update()
 {
     echo "-- Process: $FUNCNAME ..."
+
     pushd $DST_SDK > /dev/null
     git checkout -q $VER_SDK
     git submodule update --init --recursive
     popd > /dev/null
+
+    echo "if(\${use_mqtt} AND (NOT DEFINED use_mqtt_kit OR NOT \${use_mqtt_kit}))" >> $CMAKE_SAMPLE
+    echo "   add_subdirectory($SRC_SAMPLE $BIN_SAMPLE)" >> $CMAKE_SAMPLE
+    echo "endif()" >> $CMAKE_SAMPLE
+
     echo "-- Process: $FUNCNAME DONE!!"
 }
 
@@ -121,4 +117,3 @@ function main()
 }
 
 main "$@"
-
