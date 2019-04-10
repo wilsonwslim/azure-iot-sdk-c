@@ -27,7 +27,7 @@ release_azure-iot-sdk-c:
     only:
         - tags
     variables:
-        REPOSITORY: "git@github.com:kbwilson89/azure-iot-sdk-c.git"
+        REPOSITORY: "git@github.com:wilsonwslim/azure-iot-sdk-c.git"
         BRANCH: "master"
     script:
         - ./setup.sh
